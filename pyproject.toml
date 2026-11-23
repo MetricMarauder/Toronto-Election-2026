@@ -1,0 +1,23 @@
+# Makes this folder an installable package. After
+#     pip install -e .
+# the command `election-map` (and `python -m election_map`) works from ANY folder,
+# and edits to the code take effect immediately (-e = "editable").
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "election_map"
+version = "0.1.0"
+description = "Turn poll-by-poll election spreadsheets into interactive maps"
+requires-python = ">=3.9"
+dependencies = ["pandas", "openpyxl", "geopandas", "folium", "mapclassify", "matplotlib"]
+
+[project.optional-dependencies]
+dev = ["pytest", "jupyter"]
+
+[project.scripts]
+election-map = "election_map.__main__:main"
+
+[tool.setuptools]
+packages = ["election_map"]
