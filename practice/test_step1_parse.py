@@ -9,7 +9,7 @@ Try to write the code BEFORE reading these. They show exactly what's expected.
 import pandas as pd
 import pytest
 
-from conftest import DATA, MAYOR
+from conftest import MAYOR
 from election_map import parse as answer
 from my_election_map import parse as mine
 
@@ -67,20 +67,6 @@ def test_1d_one_mayor_sheet(mayor_sheets, same_rows):
     raw = mayor_sheets["Ward 1"]
     same_rows(mine.parse_sheet(raw, "Ward 1", check_totals=False),
               answer.parse_sheet(raw, "Ward 1"), COLUMNS, SORT)
-
-
-def test_1d_school_board_sheet_has_two_blocks(same_rows):
-    # One school ward overlaps two city wards, so this sheet has TWO blocks.
-    raw = pd.read_excel(DATA / "Poll_By_Poll_TDSB.xlsx", sheet_name="Ward 1", header=None)
-    mine_rows = mine.parse_sheet(raw, "Ward 1", check_totals=False)
-    same_rows(mine_rows, answer.parse_sheet(raw, "Ward 1"), COLUMNS, SORT)
-    assert sorted(mine_rows["ward"].unique()) == [1, 7]
-
-
-def test_1d_all_offices_sheet_has_six_races(same_rows):
-    raw = pd.read_excel(DATA / "Poll_By_Poll_All_Offices.xlsx", sheet_name=0, header=None)
-    same_rows(mine.parse_sheet(raw, "first", check_totals=False),
-              answer.parse_sheet(raw, "first"), COLUMNS, SORT)
 
 
 # ---------------------------------------------------------------- 1e

@@ -36,6 +36,11 @@ def main(argv=None) -> int:
     stop with a helpful message.
 
     Return 0 when everything worked.
+
+    PART 2 adds three options (come back for these later):
+        --ward N [N ...]  Step 6b: keep only these wards (e.g. --ward 10)
+        --list            Step 8b: print each contest's name, one per line, and stop
+        --contest NAME    Step 8b: keep only this contest (e.g. --contest Mayor)
     """
     raise NotImplementedError("Step 5a: main")
 
