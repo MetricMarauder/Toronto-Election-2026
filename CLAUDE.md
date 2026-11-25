@@ -6,6 +6,11 @@ The owner is **learning Python** through this project and said: "teach me, don't
 - Write the code only when they ask, or after they've had a go. Keep changes small and explain each line that matters.
 - Use plain language, and use visual or step-by-step explanations where you can.
 
+## practice/ is the owner's own code
+`practice/my_election_map/` is a step-by-step rebuild the owner writes themselves, following BUILD_IT_YOURSELF.md. Its functions start empty on purpose.
+- Never fill them in unprompted. Give hints in the guide's style, one at a time, and point to the matching function in `election_map/` only if they're stuck.
+- Checkers: `python -m pytest practice -rs -k 1a` (steps not yet written show as SKIPPED). A plain `python -m pytest` runs only `tests/`.
+
 ## What it does
 Toronto poll-by-poll .xlsx files → one row per subdivision → join to voting-subdivision polygons → folium map (HTML) plus optional PNG.
 Pipeline: `parse.py` → `metrics.py` → `geo.py` → `mapmaker.py`, wired together in `__main__.py` (`election-map` CLI).

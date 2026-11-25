@@ -12,6 +12,7 @@ What you get:
 * `mayor.png` (add `--png`): a static image for slides and reports.
 
 New to Python? Read **LEARN.md** first. It walks through the code in the order the data flows.
+Want to write it yourself? **BUILD_IT_YOURSELF.md** rebuilds the tool step by step in `practice/`, with checkers for every step.
 
 ## Setup (Mac, one time)
 

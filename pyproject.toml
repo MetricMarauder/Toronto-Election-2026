@@ -18,6 +18,17 @@ dev = ["pytest", "jupyter"]
 
 [project.scripts]
 election-map = "election_map.__main__:main"
+# Your own version, built step by step in practice/ (see BUILD_IT_YOURSELF.md)
+my-election-map = "my_election_map.cli:main"
 
 [tool.setuptools]
-packages = ["election_map"]
+packages = ["election_map", "my_election_map"]
+
+[tool.setuptools.package-dir]
+# my_election_map lives in practice/, not the top folder
+my_election_map = "practice/my_election_map"
+
+[tool.pytest.ini_options]
+# A plain `python -m pytest` runs only the finished tool's tests.
+# Check your practice work with `python -m pytest practice -rs`.
+testpaths = ["tests"]
