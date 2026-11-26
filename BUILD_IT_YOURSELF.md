@@ -22,7 +22,7 @@ git add practice && git commit -m "step 1" && git push
 | Use | For |
 |---|---|
 | `pd.read_excel(path, sheet_name=None, header=1)` | Read all tabs, using the "Subdivision" row as the header |
-| filter rows | Drop the "Mayor" row and the "City Ward N Totals" row |
+| filter | Drop the "Mayor" row, the "City Ward N Totals" row, and the "Total" column |
 | `.melt()` | Flip it, so the subdivision columns become rows |
 | new column | `ward` = the number from the tab name ("Ward 1" gives 1) |
 | `pd.concat(tables, ignore_index=True)` | Stack all 25 tabs (`ignore_index` gives every row its own number) |
