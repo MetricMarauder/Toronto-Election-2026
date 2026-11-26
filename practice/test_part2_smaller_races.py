@@ -6,9 +6,7 @@ Run:  python -m pytest practice -rs -k 6a      (or 6b, 7a, 7b, 8a, 8b)
 import pandas as pd
 import pytest
 
-from conftest import DATA
-from election_map import parse as answer_parse
-from election_map import metrics as answer_metrics
+from conftest import DATA, answer
 from my_election_map import parse as mine
 from my_election_map import metrics as mine_metrics
 from my_election_map.cli import main
@@ -25,7 +23,7 @@ SORT = ["sheet", "contest", "ward", "subdiv", "candidate"]
 def test_6a_councillor_file_parses(same_rows):
     long = mine.read_poll_by_poll(COUNCILLOR)
     assert long["votes"].sum() == 932_157
-    same_rows(long, answer_parse.read_poll_by_poll(COUNCILLOR), COLUMNS, SORT)
+    same_rows(long, answer("councillor_long"), COLUMNS, SORT)
 
 
 def test_6b_one_ward_only(tmp_path):
@@ -33,8 +31,7 @@ def test_6b_one_ward_only(tmp_path):
     assert main([str(COUNCILLOR), "--ward", "10", "--csv-only", "--out", str(out)]) == 0
     table = pd.read_csv(out.with_suffix(".csv"))
     assert set(table["ward"]) == {10}, "--ward 10 should keep only ward 10"
-    expected = answer_parse.read_poll_by_poll(COUNCILLOR)
-    assert len(table) == expected[expected.ward == 10]["subdiv"].nunique()
+    assert len(table) == 80, "ward 10 has 80 subdivisions (including advance polls)"
 
 
 def test_6b_margin_map(fake_shapes, tmp_path):
@@ -52,22 +49,22 @@ def test_7a_sheet_with_two_blocks(same_rows):
     raw = pd.read_excel(TDSB, sheet_name="Ward 1", header=None)
     rows = mine.parse_sheet(raw, "Ward 1")
     cols = ["contest", "ward", "subdiv", "candidate", "votes"]
-    same_rows(rows, answer_parse.parse_sheet(raw, "Ward 1"), cols, cols[:4])
+    tdsb = answer("tdsb_long")
+    same_rows(rows, tdsb[tdsb.sheet == "Ward 1"], cols, cols[:4])
     assert sorted(rows["ward"].unique()) == [1, 7]
 
 
 def test_7a_whole_school_board_file(same_rows):
     long = mine.read_poll_by_poll(TDSB)
     assert long["votes"].sum() == 672_546
-    same_rows(long, answer_parse.read_poll_by_poll(TDSB), COLUMNS, SORT)
+    same_rows(long, answer("tdsb_long"), COLUMNS, SORT)
 
 
 def test_7b_tiny_board_has_empty_polls():
     # The French public board got only 2,652 votes, so most subdivisions are empty.
     long = mine.read_poll_by_poll(FRENCH)
     s = mine_metrics.summarize(long)
-    expected = answer_metrics.summarize(answer_parse.read_poll_by_poll(FRENCH))
-    assert s["winner"].isna().sum() == expected["winner"].isna().sum() > 0
+    assert s["winner"].isna().sum() == 1_149, "subdivisions where nobody voted"
     assert s["total"].sum() == 2_652
 
 
@@ -75,8 +72,8 @@ def test_7b_tiny_board_has_empty_polls():
 def test_8a_sheet_with_six_races(same_rows):
     raw = pd.read_excel(ALL, sheet_name=0, header=None)
     cols = ["contest", "ward", "subdiv", "candidate", "votes"]
-    rows = mine.parse_sheet(raw, "first")
-    same_rows(rows, answer_parse.parse_sheet(raw, "first"), cols, cols[:4])
+    rows = mine.parse_sheet(raw, "Ward 1")
+    same_rows(rows, answer("all_offices_first_sheet"), cols, cols[:4])
     assert rows["contest"].nunique() == 6
 
 

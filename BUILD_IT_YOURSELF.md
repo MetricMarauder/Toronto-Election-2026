@@ -9,7 +9,9 @@ spreadsheets (`data/*.xlsx`).
 | Folder | What's in it |
 |---|---|
 | `practice/my_election_map/` | **Your code.** Every function is empty and says what it should do. |
-| `election_map/` | The finished version. Peek only when you're stuck. |
+| `practice/answers/` | The correct results the checkers compare yours with. |
+
+The finished, working code is on the `main` branch, not this one. Peek at it on GitHub only when you're stuck.
 
 ## Setup (once)
 

@@ -10,7 +10,6 @@ import pandas as pd
 import pytest
 
 from conftest import MAYOR
-from election_map import parse as answer
 from my_election_map import parse as mine
 
 
@@ -63,10 +62,10 @@ COLUMNS = ["contest", "ward", "subdiv", "candidate", "votes"]
 SORT = ["contest", "ward", "subdiv", "candidate"]
 
 
-def test_1d_one_mayor_sheet(mayor_sheets, same_rows):
+def test_1d_one_mayor_sheet(mayor_sheets, answer_long, same_rows):
     raw = mayor_sheets["Ward 1"]
     same_rows(mine.parse_sheet(raw, "Ward 1", check_totals=False),
-              answer.parse_sheet(raw, "Ward 1"), COLUMNS, SORT)
+              answer_long[answer_long.sheet == "Ward 1"], COLUMNS, SORT)
 
 
 # ---------------------------------------------------------------- 1e

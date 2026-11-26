@@ -8,8 +8,9 @@ The owner is **learning Python** through this project and said: "teach me, don't
 
 ## practice/ is the owner's own code
 `practice/my_election_map/` is a step-by-step rebuild the owner writes themselves, following BUILD_IT_YOURSELF.md. Its functions start empty on purpose.
-- Never fill them in unprompted. Give hints in the guide's style, one at a time, and point to the matching function in `election_map/` only if they're stuck.
-- Checkers: `python -m pytest practice -rs -k 1a` (steps not yet written show as SKIPPED). A plain `python -m pytest` runs only `tests/`.
+- Never fill them in unprompted. Give hints in the guide's style, one at a time. Point to the matching function on the `main` branch only if they're stuck.
+- On this branch the owner removed all AI-written code: `election_map/`, `tests/` and `notebooks/` exist only on `main`. Don't add them back here.
+- Checkers: `python -m pytest practice -rs -k 1a` (steps not yet written show as SKIPPED). They compare with saved answers in `practice/answers/`.
 
 ## What it does
 Toronto poll-by-poll .xlsx files → one row per subdivision → join to voting-subdivision polygons → folium map (HTML) plus optional PNG.

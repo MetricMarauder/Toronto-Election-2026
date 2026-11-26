@@ -2,23 +2,21 @@
 Shared set-up for the practice checkers. You don't need to edit this file.
 
 Two things happen here:
-1. Fixtures: data every checker needs (the Mayor workbook, the finished tool's
-   answers, fake boundary squares). pytest hands them to any test function
+1. Fixtures: data every checker needs. The correct answers are saved as
+   tables in practice/answers/, and pytest hands them to any test function
    that names them as an argument.
 2. A friendly rule: if your function still says `raise NotImplementedError`,
    its checks show as SKIPPED ("not written yet") instead of FAILED.
    So a run of all the checkers doubles as a progress bar.
 """
-import sys
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))           # so `tests.fake_boundaries` can be imported
-
 DATA = ROOT / "data"
+ANSWERS = Path(__file__).resolve().parent / "answers"
 MAYOR = DATA / "Poll_By_Poll_Mayor.xlsx"
 
 
@@ -33,6 +31,11 @@ def pytest_runtest_makereport(item, call):
                            f"not written yet: {call.excinfo.value}")
 
 
+def answer(name):
+    """Load a saved correct answer, e.g. answer("mayor_long")."""
+    return pd.read_csv(ANSWERS / f"{name}.csv.gz")
+
+
 # ---------------------------------------------------------------- fixtures
 @pytest.fixture(scope="session")
 def mayor_sheets():
@@ -44,34 +47,57 @@ def mayor_sheets():
 
 @pytest.fixture(scope="session")
 def answer_long():
-    """The finished tool's long table for the Mayor file (Step 1's answer)."""
-    from election_map.parse import read_poll_by_poll
-    return read_poll_by_poll(MAYOR)
+    """The correct long table for the Mayor file (Step 1's answer)."""
+    return answer("mayor_long")
 
 
 @pytest.fixture(scope="session")
-def answer_summary(answer_long):
-    """The finished tool's per-subdivision summary (Step 2's answer)."""
-    from election_map.metrics import summarize
-    return summarize(answer_long, compare=("Chow Olivia", "Bradford Brad"))
+def answer_summary():
+    """The correct per-subdivision summary, with compare=Chow vs Bradford (Step 2's answer)."""
+    return answer("mayor_summary")
 
 
 @pytest.fixture(scope="session")
 def fake_shapes(answer_summary):
-    """Fake square 'subdivisions', coded like the real layer: AREA_LONG_CODE = '01005'."""
-    from tests.fake_boundaries import fake_boundaries
-    return fake_boundaries(answer_summary)
+    """FAKE square 'subdivisions', a grid over Toronto, one per subdivision,
+    coded like the real layer: AREA_LONG_CODE = "01005".
+
+    Fake shapes let the checkers run offline in seconds. Your real run
+    checks the real boundaries.
+    """
+    import geopandas as gpd
+    from shapely.geometry import box
+    pairs = answer_summary[["ward", "subdiv"]].drop_duplicates()
+    pairs = pairs[pairs.subdiv < 90]                 # advance polls have no area
+    rows = []
+    for i, (w, s) in enumerate(pairs.itertuples(index=False)):
+        col, row = (w - 1) % 5, (w - 1) // 5         # 5x5 grid of wards
+        x0 = -79.60 + col * 0.06 + (s % 8) * 0.0075
+        y0 = 43.60 + row * 0.04 + ((s // 8) % 8) * 0.005
+        rows.append({"OBJECTID": i + 1, "AREA_LONG_CODE": f"{w:02d}{s:03d}",
+                     "geometry": box(x0, y0, x0 + 0.0075, y0 + 0.005)})
+    return gpd.GeoDataFrame(rows, crs=4326)
+
+
+@pytest.fixture(scope="session")
+def joined(fake_shapes, answer_summary):
+    """Fake shapes with the votes already attached: ready to map (Step 4's input)."""
+    import geopandas as gpd
+    codes = answer_summary.assign(
+        AREA_LONG_CODE=[f"{w:02d}{s:03d}" for w, s in zip(answer_summary.ward, answer_summary.subdiv)])
+    table = fake_shapes.merge(codes, on="AREA_LONG_CODE", how="left")
+    return gpd.GeoDataFrame(table, geometry="geometry", crs=fake_shapes.crs)
 
 
 @pytest.fixture
 def same_rows():
     """Compare your table with the answer, ignoring row order and column order."""
-    def check(mine, answer, columns, sort_by):
+    def check(mine, correct, columns, sort_by):
         missing = [c for c in columns if c not in mine.columns]
         assert not missing, f"your table is missing these columns: {missing}"
-        assert len(mine) == len(answer), \
-            f"your table has {len(mine):,} rows, the answer has {len(answer):,}"
+        assert len(mine) == len(correct), \
+            f"your table has {len(mine):,} rows, the answer has {len(correct):,}"
         a = mine[columns].sort_values(sort_by).reset_index(drop=True)
-        b = answer[columns].sort_values(sort_by).reset_index(drop=True)
+        b = correct[columns].sort_values(sort_by).reset_index(drop=True)
         pd.testing.assert_frame_equal(a, b, check_dtype=False)
     return check

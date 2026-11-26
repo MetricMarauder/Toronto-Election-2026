@@ -1,7 +1,7 @@
 """
 Checkers for STEP 3 (practice/my_election_map/geo.py).
 
-These use FAKE square boundaries (tests/fake_boundaries.py) coded like the
+These use FAKE square boundaries (made in conftest.py) coded like the
 real layer, so they run offline in seconds. Your real run checks the real ones.
 
 Run:  python -m pytest practice -rs -k 3a      (or 3b, 3c)
@@ -9,7 +9,6 @@ Run:  python -m pytest practice -rs -k 3a      (or 3b, 3c)
 import geopandas as gpd
 import pytest
 
-from election_map import geo as answer
 from my_election_map import geo as mine
 
 
@@ -45,13 +44,9 @@ def test_3b_missing_file():
 
 
 # ---------------------------------------------------------------- 3c
-def answer_join(shapes, summary):
-    return answer.join(shapes, summary, field="AREA_LONG_CODE", key_format="WWSSS (01005)")
-
-
 def test_3c_join_report(fake_shapes, answer_summary):
     gdf, report = mine.join(fake_shapes, answer_summary)
-    _, expected = answer_join(fake_shapes, answer_summary)
+    expected = {"matched": 1348, "shapes_without_results": 0, "results_without_shapes": 83}
     for k in ["matched", "shapes_without_results", "results_without_shapes"]:
         assert report[k] == expected[k], f"report[{k!r}] is {report[k]}, expected {expected[k]}"
     assert report["shapes_without_results"] == 0
@@ -72,7 +67,6 @@ def test_3c_one_ward_only(fake_shapes, answer_summary):
     # Results for ward 10 only: every OTHER shape should count as "without results".
     one_ward = answer_summary[answer_summary["ward"] == 10]
     gdf, report = mine.join(fake_shapes, one_ward)
-    _, expected = answer_join(fake_shapes, one_ward)
-    assert report["matched"] == expected["matched"]
-    assert report["shapes_without_results"] == expected["shapes_without_results"]
+    assert report["matched"] == 73, "ward 10 has 73 subdivisions with a shape"
+    assert report["shapes_without_results"] == 1348 - 73
     assert len(gdf) == len(fake_shapes)

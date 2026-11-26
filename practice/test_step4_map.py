@@ -10,15 +10,7 @@ Tip:  add --basetemp=practice_out to keep the test maps so you can open them.
 import pandas as pd
 import pytest
 
-from election_map import geo as answer_geo
 from my_election_map import mapmaker as mine
-
-
-@pytest.fixture(scope="module")
-def joined(fake_shapes, answer_summary):
-    gdf, _ = answer_geo.join(fake_shapes, answer_summary, field="AREA_LONG_CODE",
-                             key_format="WWSSS (01005)")
-    return gdf
 
 
 # ---------------------------------------------------------------- 4a
