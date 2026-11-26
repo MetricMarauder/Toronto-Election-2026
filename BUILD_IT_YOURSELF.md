@@ -96,7 +96,7 @@ pd.read_excel("data/Poll_By_Poll_Mayor.xlsx", sheet_name="Ward 1", header=None)
 - 3c: `merge(..., how="outer", indicator=True)`, then count the `_merge` column
 </details>
 
-Get the real boundaries first: in QGIS, export your *Voting Subdivision 2026* layer as `data/subdivisions.gpkg` (the README has the clicks).
+Get the real boundaries first: in QGIS, right-click your *Voting Subdivision 2026* layer, choose **Export → Save Features As…**, set Format to **GeoPackage**, and save it as `data/subdivisions.gpkg`.
 
 ✅ On the real boundaries: **1,356 of 1,356** shapes matched.
 
