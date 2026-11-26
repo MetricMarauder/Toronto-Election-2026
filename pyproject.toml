@@ -1,7 +1,5 @@
-# Makes this folder an installable package. After
-#     pip install -e .
-# the command `election-map` (and `python -m election_map`) works from ANY folder,
-# and edits to the code take effect immediately (-e = "editable").
+# Project settings. After `pip install -e .` you can `import my_map` from any
+# folder, and edits to your code take effect immediately (-e = "editable").
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
@@ -16,17 +14,11 @@ dependencies = ["pandas", "openpyxl", "geopandas", "folium", "mapclassify", "mat
 [project.optional-dependencies]
 dev = ["pytest", "jupyter"]
 
-[project.scripts]
-# Your own version, built step by step in practice/ (see BUILD_IT_YOURSELF.md)
-my-election-map = "my_election_map.cli:main"
-
 [tool.setuptools]
-packages = ["my_election_map"]
-
-[tool.setuptools.package-dir]
-# my_election_map lives in practice/, not the top folder
-my_election_map = "practice/my_election_map"
+# your code: practice/my_map.py  (so `import my_map` works anywhere)
+py-modules = ["my_map"]
+package-dir = {"" = "practice"}
 
 [tool.pytest.ini_options]
-# `python -m pytest -rs` runs your practice checkers.
+# `python -m pytest -rs` runs the checks for your 4 steps.
 testpaths = ["practice"]
